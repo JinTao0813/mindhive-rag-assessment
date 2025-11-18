@@ -19,7 +19,7 @@ def scrape_drinkware():
     for card in product_cards:
 
         title_tag = card.select_one(".product-card__title a")
-        name = title_tag.get_text(strip=True) if title_tag else None
+        title = title_tag.get_text(strip=True) if title_tag else None
 
         link = None
         if title_tag and title_tag.has_attr("href"):
@@ -37,7 +37,7 @@ def scrape_drinkware():
         image_url = img_tag["src"] if img_tag and img_tag.has_attr("src") else None
 
         products.append({
-            "name": name,
+            "name": title,
             "link": link,
             "category": category,
             "price": price,
