@@ -5,7 +5,7 @@ import faiss
 import pickle
 import os
 
-from app.routers import products, outlets
+from app.routers import products, outlets, chat
 from dependencies import DB_PATH
 
 # Global state dictionary to hold ML models
@@ -38,6 +38,7 @@ app.state.ml_models = ml_models
 
 app.include_router(products.router, prefix="/products", tags=["Products"])
 app.include_router(outlets.router, prefix="/outlets", tags=["Outlets"])
+app.include_router(chat.router, prefix="/chat", tags=["Chat"])
 
 @app.get("/")
 def root():

@@ -8,14 +8,10 @@ class SQLService:
         self.db_path = db_path
 
     def _is_safe_select(self, sql_text: str) -> bool:
-        """Internal helper: strict check to ensure only SELECT statements are run."""
         clean_sql = sql_text.strip().lower()
         return bool(re.match(r"^select\b", clean_sql))
 
     def process_natural_language_query(self, user_query: str, max_rows: int = 50):
-        """
-        Generates SQL from English, sanitizes it, executes it, and returns results.
-        """
         try:
             # 1. Constructing the prompt
             # We provide the schema explicitly to help the LLM
