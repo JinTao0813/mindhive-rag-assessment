@@ -3,7 +3,7 @@ import sqlite3
 from fastapi import APIRouter, HTTPException, Depends
 from langchain_community.utilities import SQLDatabase
 from app.schemas import NLQuery
-from dependencies import llm, get_db, DB_PATH
+from dependencies import llm, get_db_path, DB_PATH
 
 router = APIRouter()
 

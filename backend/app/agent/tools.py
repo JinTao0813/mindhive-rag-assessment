@@ -1,11 +1,11 @@
 from langchain.tools import tool
 from app.services.rag_service import RAGService
 from app.services.sql_service import SQLService
-from dependencies import llm, get_db
+from dependencies import llm, get_db_path
 
 # 1. Initialize Services
 rag_service = RAGService(llm)
-sql_service = SQLService(llm, get_db().run)
+sql_service = SQLService(llm, get_db_path())
 
 # 2. Define the Calculator Tool
 @tool
@@ -34,8 +34,8 @@ def product_search(query: str) -> str:
 # 4. Wrap Text-to-SQL (Outlets) as a Tool
 @tool
 def outlet_search(query: str) -> str:
-    """Search for ZUS Coffee outlet locations, hours, or specific features (like drive-thru).
-    Useful when the user asks 'Where is the nearest store?' or 'Is X open?'."""
+    """Search for ZUS Coffee outlet locations, hours, or specific features..."""
+    print(f"DEBUG: Agent called outlet_search with query: '{query}'") # <--- ADD THIS
     try:
         result = sql_service.process_natural_language_query(query)
         if result["count"] == 0:
