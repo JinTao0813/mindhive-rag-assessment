@@ -4,53 +4,64 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import json
 
-OUTLETS_URL = "https://zuscoffee.com/category/store/kuala-lumpur-selangor/"
+OUTLETS_URL = "https://zuscoffee.com/category/store/kuala-lumpur-selangor/page/{page}/"
+
 
 def scrape_outlets():
-    response = requests.get(OUTLETS_URL)
-    response.raise_for_status()
-    soup = BeautifulSoup(response.content, "html.parser")
 
-    outlets = []
+    all_outlets = [] 
+    page = 1
 
-    # Each outlet is one <article> card
-    outlet_cards = soup.select("article.elementor-post")
+    while True:
+        print(f"Scraping: {OUTLETS_URL.format(page=page)}")
 
-    for card in outlet_cards:
+        response = requests.get(OUTLETS_URL.format(page=page))
+        response.raise_for_status()
 
-        # 1. Outlet Name (first <p> with elementor-heading-title)
-        title_tag = card.select_one("p.elementor-heading-title")
-        title = title_tag.get_text(strip=True) if title_tag else None
+        soup = BeautifulSoup(response.text, "html.parser")
 
-        # 2. Location Category (KL/Selangor)
-        category_tag = card.select_one("h2.elementor-heading-title a")
-        category = category_tag.get_text(strip=True) if category_tag else None
+        outlet_cards = soup.select("article.elementor-post.elementor-grid-item")
 
-        # 3. Address (second <p> in article)
-        p_tags = card.select("p")
-        address = p_tags[1].get_text(strip=True) if len(p_tags) > 1 else None
+        if not outlet_cards:
+            print("No more outlet pages found. Stopping.")
+            break
 
-        # 4. Google Maps Link
-        direction_tag = card.select_one("a.premium-button")
-        maps_url = direction_tag["href"] if direction_tag else None
+        for card in outlet_cards:
 
-        outlets.append({
-            "name": title,
-            "category": category,
-            "address": address,
-            "maps_url": maps_url
-        })
+            title_tag = card.select_one("p.elementor-heading-title")
+            title = title_tag.get_text(strip=True) if title_tag else None
 
-    # Save data
+            category_tag = card.select_one("h2.elementor-heading-title a")
+            category = category_tag.get_text(strip=True) if category_tag else None
+
+            address_tag = card.select_one(".elementor-widget-theme-post-content p")
+            address = address_tag.get_text(strip=True) if address_tag else None
+
+            direction_tag = card.select_one("a.premium-button")
+            maps_url = direction_tag["href"] if direction_tag else None
+
+            if not title or not address or not maps_url or not category:
+                continue
+
+            all_outlets.append({
+                "name": title,
+                "category": category,
+                "address": address,
+                "maps_url": maps_url
+            })
+
+        page += 1
+
+    # ----- Save final data -----
+
     os.makedirs("data", exist_ok=True)
 
     with open("data/outlets.json", "w", encoding="utf-8") as f:
-        json.dump(outlets, f, indent=4, ensure_ascii=False)
+        json.dump(all_outlets, f, indent=4, ensure_ascii=False)
 
-    df = pd.DataFrame(outlets)
-    df.to_csv("data/outlets.csv", index=False)
+    pd.DataFrame(all_outlets).to_csv("data/outlets.csv", index=False)
 
-    print(f"Scraped {len(outlets)} outlets successfully!")
+    print(f"Scraped total {len(all_outlets)} outlets successfully!")
 
 if __name__ == "__main__":
     scrape_outlets()
