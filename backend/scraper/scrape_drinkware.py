@@ -7,7 +7,6 @@ import json
 DRINKWARE_URL = "https://shop.zuscoffee.com/collections/drinkware"
 
 def scrape_drinkware():
-    # Fetch page
     response = requests.get(DRINKWARE_URL)
     response.raise_for_status()
     soup = BeautifulSoup(response.content, "html.parser")
@@ -44,13 +43,13 @@ def scrape_drinkware():
             "image_url": image_url
         })
 
-    os.makedirs("data", exist_ok=True)
+    os.makedirs("backend/data", exist_ok=True)
 
-    with open("data/drinkware.json", "w", encoding="utf-8") as f:
+    with open("backend/data/drinkware.json", "w", encoding="utf-8") as f:
         json.dump(products, f, indent=4, ensure_ascii=False)
 
     df = pd.DataFrame(products)
-    df.to_csv("data/drinkware.csv", index=False)
+    df.to_csv("backend/data/drinkware.csv", index=False)
 
     print(f"Scraped {len(products)} drinkware products.")
 

@@ -1,0 +1,45 @@
+from contextlib import asynccontextmanager
+from fastapi import FastAPI
+from sentence_transformers import SentenceTransformer
+import faiss
+import pickle
+import os
+
+from app.routers import products, outlets
+from dependencies import DB_PATH
+
+# Global state dictionary to hold ML models
+ml_models = {}
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("Loading FAISS Index and Embeddings...")
+
+    FAISS_INDEX_PATH = os.path.join("data", "faiss_index.faiss")
+    META_PATH = os.path.join("data", "faiss_meta.pkl")
+    
+    ml_models["embed_model"] = SentenceTransformer("sentence-transformers/all-mpnet-base-v2")
+    
+    if os.path.exists(FAISS_INDEX_PATH):
+        ml_models["faiss_index"] = faiss.read_index(FAISS_INDEX_PATH)
+    
+    if os.path.exists(META_PATH):
+        with open(META_PATH, "rb") as f:
+            ml_models["meta"] = pickle.load(f)
+            
+    yield
+
+    ml_models.clear()
+
+app = FastAPI(lifespan=lifespan)
+
+app.state.ml_models = ml_models
+
+
+app.include_router(products.router, prefix="/products", tags=["Products"])
+app.include_router(outlets.router, prefix="/outlets", tags=["Outlets"])
+
+@app.get("/")
+def root():
+    return {"message": "ZUS Coffee Agent API is running"}
+

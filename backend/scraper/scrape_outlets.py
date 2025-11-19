@@ -52,14 +52,12 @@ def scrape_outlets():
 
         page += 1
 
-    # ----- Save final data -----
+    os.makedirs("backend/data", exist_ok=True)
 
-    os.makedirs("data", exist_ok=True)
-
-    with open("data/outlets.json", "w", encoding="utf-8") as f:
+    with open("backend/data/outlets.json", "w", encoding="utf-8") as f:
         json.dump(all_outlets, f, indent=4, ensure_ascii=False)
 
-    pd.DataFrame(all_outlets).to_csv("data/outlets.csv", index=False)
+    pd.DataFrame(all_outlets).to_csv("backend/data/outlets.csv", index=False)
 
     print(f"Scraped total {len(all_outlets)} outlets successfully!")
 
