@@ -14,23 +14,30 @@ ml_models = {}
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("Loading FAISS Index and Embeddings...")
+    try:
+        print("Loading FAISS Index and Embeddings...")
 
-    FAISS_INDEX_PATH = os.path.join("data", "faiss_index.faiss")
-    META_PATH = os.path.join("data", "faiss_meta.pkl")
-    
-    ml_models["embed_model"] = SentenceTransformer("sentence-transformers/all-mpnet-base-v2")
-    
-    if os.path.exists(FAISS_INDEX_PATH):
-        ml_models["faiss_index"] = faiss.read_index(FAISS_INDEX_PATH)
-    
-    if os.path.exists(META_PATH):
-        with open(META_PATH, "rb") as f:
-            ml_models["meta"] = pickle.load(f)
-            
+        FAISS_INDEX_PATH = os.path.join("data", "faiss_index.faiss")
+        META_PATH = os.path.join("data", "faiss_meta.pkl")
+        
+        ml_models["embed_model"] = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+        print("Model loaded.")
+
+        if os.path.exists(FAISS_INDEX_PATH):
+            ml_models["faiss_index"] = faiss.read_index(FAISS_INDEX_PATH)
+            print("FAISS loaded.")
+
+        if os.path.exists(META_PATH):
+            with open(META_PATH, "rb") as f:
+                ml_models["meta"] = pickle.load(f)
+            print("META loaded.")
+
+    except Exception as e:
+        print("Startup error:", e)
+
     yield
-
     ml_models.clear()
+
 
 app = FastAPI(lifespan=lifespan)
 
@@ -40,7 +47,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",  # Vite development server
         "http://localhost:3000",  # Alternative dev port
-        # Add your Vercel domain when deploying: "https://your-app.vercel.app"
+        "https://mindhive-rag.vercel.app"
     ],
     allow_credentials=True,
     allow_methods=["*"],
