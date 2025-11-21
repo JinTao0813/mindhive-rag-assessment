@@ -400,6 +400,19 @@ mindhive-rag-assessment/
 - **Retrieval**: Top-k semantic search
 - **Summarization**: LLM generates natural language response
 
+**Technology Selection: FAISS vs ChromaDB**
+
+I chose **FAISS (Facebook AI Similarity Search)** over ChromaDB for the following reasons:
+
+- **Performance**: FAISS uses a highly optimized C++ backend, ensuring fast search operations even with growing datasets
+- **Scalability**: Built-in GPU support for large-scale similarity search (though using CPU version for this project)
+- **Fine-Grained Control**: Provides extensive configuration options for index types, distance metrics, and search parameters
+- **Industry Standard**: Recommended by LangChain and widely adopted as best practice in production RAG systems
+- **Proven Compatibility**: The MPNet + FAISS combination is battle-tested and commonly used in industry applications
+- **Dataset Suitability**: Perfect for my use case (~50 products) with room to scale efficiently
+
+While ChromaDB offers a simpler API and built-in metadata filtering, FAISS's performance characteristics and industry adoption made it the optimal choice for this assessment.
+
 **Implementation:**
 
 ```python
