@@ -51,17 +51,17 @@ Thank you for your time and consideration. I look forward to discussing this pro
 
 ## 📋 Table of Contents
 
-- [Overview](#overview)
-- [Features](#features)
-- [Architecture](#architecture)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Setup & Installation](#setup--installation)
-- [Implementation Details](#implementation-details)
-- [API Documentation](#api-documentation)
-- [Testing](#testing)
-- [Challenges & Solutions](#challenges--solutions)
-- [Not Implemented](#not-implemented)
+- [Overview](#-overview)
+- [Features](#-features)
+- [Architecture](#️-architecture)
+- [Tech Stack](#️-tech-stack)
+- [Project Structure](#-project-structure)
+- [Setup & Installation](#-setup--installation)
+- [Implementation Summary](#-implementation-summary)
+- [Implementation Details](#-implementation-details)
+- [API Documentation](#-api-documentation)
+- [Testing](#-testing)
+- [Challenges & Solutions](#-challenges--solutions)
 
 ---
 
