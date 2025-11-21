@@ -67,6 +67,8 @@ Thank you for your time and consideration. I look forward to discussing this pro
 
 ## 🎯 Overview
 
+Vercel (Frontend): [https://mindhive-rag-assessment.vercel.app/](https://mindhive-rag-assessment.vercel.app/)
+
 This project implements an **intelligent conversational agent** for ZUS Coffee that can:
 
 1. **Answer product questions** using RAG with FAISS vector store
@@ -348,12 +350,21 @@ mindhive-rag-assessment/
 
    Frontend runs at: `http://localhost:5173`
 
-### Running Tests
+---
 
-```bash
-cd backend
-pytest tests/ -v
-```
+### 📊 Implementation Summary
+
+| Phase        | Component              | Status             | Completion | Blocker/Notes                                                                                      |
+| ------------ | ---------------------- | ------------------ | ---------- | -------------------------------------------------------------------------------------------------- |
+| **Phase 1**  | Agent Foundation       | ✅ Complete        | 100%       | -                                                                                                  |
+| **Phase 2**  | RAG System             | ✅ Complete        | 100%       | -                                                                                                  |
+| **Phase 3**  | Text-to-SQL            | ✅ Complete        | 100%       | -                                                                                                  |
+| **Phase 4**  | Multi-Tool Integration | ✅ Complete        | 100%       | -                                                                                                  |
+| **Phase 5**  | Testing & QA           | ✅ Complete        | 100%       | -                                                                                                  |
+| **Phase 6A** | Frontend UI            | ✅ Complete        | 100%       | -                                                                                                  |
+| **Phase 6B** | Backend Deployment     | ❌ Incomplete      | 0%         | Render "no open ports detected" error; suspected file paths, memory limits, or health check issues |
+| **Phase 6C** | Frontend Deployment    | ✅ Complete        | 100%       | Ready to deploy, waiting for backend API endpoint                                                  |
+| **Overall**  |                        | ⚠️ Mostly Complete | **87.5%**  | Core functionality complete, deployment troubleshooting needed                                     |
 
 ---
 
@@ -499,6 +510,7 @@ result = agent.invoke(
 
 **Architecture:**
 
+- **Deployment**: Vercel
 - **Composition API**: Reactive state with Vue 3
 - **Composables**: Reusable logic in `useChat.ts`
 - **TypeScript**: Full type safety
@@ -663,169 +675,133 @@ tests/test_phase1.py::test_outlets_sql_happy_path PASSED
 
 ## 🚧 Challenges & Solutions
 
-### Challenge 1: Model Loading Time
+As this was my **first project using LangChain and LangGraph**, I encountered several learning curves and technical challenges throughout the development process. Here are the key challenges I faced and how I overcame them:
 
-**Problem**: SentenceTransformer takes 3-5 seconds to load, blocking server startup.
+### Challenge 1: Learning Web Scraping from Scratch
 
-**Solution**:
+**Problem**: I had no prior experience with web scraping and needed to extract product and outlet data from the ZUS Coffee website.
 
-- Implemented asynchronous background loading with `asyncio.create_task()`
-- Server starts immediately and returns responses while models load
-- Added loading status checks in endpoints
+**Learning Process**:
 
-### Challenge 2: LLM Tool Selection Accuracy
-
-**Problem**: Agent sometimes chose wrong tool or got confused with ambiguous queries.
-
-**Solution**:
-
-- Improved tool docstrings with clear use cases and examples
-- Added system prompt guidance for tool selection
-- Implemented fallback responses for tool failures
-
-### Challenge 3: SQL Injection & Safety
-
-**Problem**: User input could potentially generate malicious SQL.
+- Studied BeautifulSoup documentation and tutorials
+- Learned how to inspect HTML elements using browser DevTools
+- Figured out how to select the proper HTML selectors (classes, IDs, tags) for target data
+- Learned to handle edge cases like missing fields and varying page structures
 
 **Solution**:
 
-- Strict validation: only SELECT queries allowed
-- Parameterized queries (though limited with Text-to-SQL)
-- Result row limits to prevent data dumps
-- Schema-aware prompts to guide LLM
+- Created robust scrapers with error handling for missing data
+- Processed scraped data into clean JSON format for downstream use
+- Implemented data validation to ensure consistency
 
-### Challenge 4: Conversation Memory Persistence
+### Challenge 2: Understanding Vector Embeddings and FAISS
 
-**Problem**: InMemorySaver loses all conversation history on server restart.
+**Problem**: The concept of embeddings and vector stores was completely new to me.
 
-**Solution Attempted**:
+**Learning Process**:
 
-- Explored SQLite checkpointer but faced integration complexity
-- **Current State**: Using InMemorySaver (acknowledged limitation)
-- **Workaround**: Frontend localStorage maintains client-side history
-
-### Challenge 5: CORS Configuration
-
-**Problem**: Frontend couldn't connect to backend due to CORS errors.
+- Watched YouTube tutorials on semantic search and embeddings
+- Used ChatGPT to understand the theory behind vector similarity
+- Learned that embeddings capture semantic meaning, not just keyword matching
+- Discovered that my dataset was small enough (~50 products) that I didn't need document splitting
 
 **Solution**:
 
-- Configured `CORSMiddleware` with specific allowed origins
-- Added localhost:5173 (Vite) and production domains
-- Enabled credentials for session management
+- Successfully implemented FAISS vector store with Sentence Transformers
+- Created ingestion pipeline to generate embeddings for all products
+- Chose not to use text splitting since my data was already at optimal granularity (product-level)
+- Achieved effective semantic search with simple product descriptions
 
-### Challenge 6: Frontend State Management
+### Challenge 3: SQL Query Cleaning for LLM Outputs
 
-**Problem**: Managing loading states, errors, and message history across components.
+**Problem**: SQLite couldn't parse raw LLM outputs directly. The LLM often returned SQL wrapped in markdown code blocks like ` ```sql SELECT * FROM outlets``` `.
+
+**Learning Process**:
+
+- Learned about regular expressions (regex) for pattern matching
+- Understood SQL injection risks and safety measures
+- Discovered I needed to sanitize LLM outputs before database execution
 
 **Solution**:
 
-- Created `useChat` composable for centralized state
-- Reactive refs for real-time UI updates
-- localStorage integration for persistence
+- Implemented regex-based SQL extraction to strip markdown formatting:
+  ````python
+  # Extract SQL from markdown code blocks
+  sql_pattern = r"```sql\s*(.*?)\s*```"
+  match = re.search(sql_pattern, llm_output, re.DOTALL)
+  if match:
+      sql = match.group(1).strip()
+  ````
+- Added validation to ensure only SELECT queries are executed
+- Implemented result limits to prevent data dumps
 
----
+### Challenge 4: Navigating Deprecated LangChain APIs
 
-## ❌ Assessment Requirements: Implementation Status
+**Problem**: ChatGPT often suggested deprecated LangChain functions, causing runtime errors and confusion.
 
-### ✅ Fully Implemented (Phases 1-5)
+**Learning Process**:
 
-**Phase 1: AI Agent Foundation** ✅ Complete
+- Realized I needed to read the **official LangChain API documentation** directly
+- Learned to identify correct, current function signatures
+- Understood key concepts like:
+  - `create_react_agent()` for agent creation
+  - `InMemorySaver()` for conversation checkpointing
+  - Proper message formatting for LangGraph agents
 
-- ✅ LangChain + LangGraph agent architecture
-- ✅ Tool-based ReAct pattern
-- ✅ Calculator tool for mathematical operations
-- ✅ Multi-turn conversation support
+**Solution**:
 
-**Phase 2: RAG System (Products)** ✅ Complete
+- Built agent implementation by referencing official docs instead of relying solely on AI assistance
+- Correctly configured:
 
-- ✅ Web scraping of ZUS Coffee drinkware products
-- ✅ FAISS vector store implementation
-- ✅ Sentence Transformers embeddings
-- ✅ Semantic search with top-k retrieval
-- ✅ LLM-based summarization of results
-- ✅ RESTful `/products/` endpoint
+  ```python
+  from langgraph.prebuilt import create_react_agent
+  from langgraph.checkpoint.memory import InMemorySaver
 
-**Phase 3: Text-to-SQL (Outlets)** ✅ Complete
+  agent = create_react_agent(
+      model=llm,
+      tools=[calculator, product_search, outlet_search],
+      checkpointer=InMemorySaver()
+  )
+  ```
 
-- ✅ Web scraping of ZUS Coffee outlet locations
-- ✅ SQLite database creation with normalized schema
-- ✅ Natural language to SQL query generation
-- ✅ SQL injection protection (SELECT-only validation)
-- ✅ RESTful `/outlets/` endpoint
+- Learned proper input/output processing for the agent:
 
-**Phase 4: Multi-Tool Integration** ✅ Complete
+  ```python
+  # Input format
+  input_payload = {"messages": [{"role": "user", "content": query}]}
 
-- ✅ Unified `/chat` endpoint with session management
-- ✅ Agent automatically selects appropriate tool
-- ✅ Conversation memory with InMemorySaver
-- ✅ Error handling and graceful degradation
+  # Output extraction
+  result = agent.invoke(input_payload, config=config)
+  response = result["messages"][-1].content
+  ```
 
-**Phase 5: Testing & Quality Assurance** ✅ Complete
+### Challenge 5: Backend Deployment Issues on Render
 
-- ✅ Pytest unit tests for all endpoints
-- ✅ RAG search validation tests
-- ✅ Text-to-SQL generation tests
-- ✅ SQL injection prevention tests
-- ✅ Comprehensive error handling
+**Problem**: Deployment to Render failed with "no open ports detected" error, despite the application working perfectly locally.
 
----
+**Investigation**:
 
-### ⚠️ Partially Implemented (Phase 6)
+- Verified build and start commands were correct
+- Ensured `$PORT` environment variable was used in uvicorn
+- Checked FAISS-CPU compatibility with platform
+- Suspected potential issues:
+  1. Relative file paths breaking in production environment
+  2. Free-tier memory limitations (~512MB) insufficient for ML models
+  3. Model loading taking too long, causing health check timeout
+  4. Missing runtime.txt specifying Python version
 
-**Phase 6A: Frontend Development** ✅ Complete
+**Current Status**:
 
-- ✅ Vue 3 + TypeScript chat interface
-- ✅ Real-time message streaming
-- ✅ Conversation history with localStorage
-- ✅ Markdown rendering with sanitization
-- ✅ Quick action buttons
-- ✅ Responsive design for mobile
+- Application runs flawlessly on localhost
+- Deployment remains incomplete due to platform-specific issues
+- Created comprehensive deployment guide with troubleshooting steps
 
-**Phase 6B: Backend Deployment** ❌ Not Completed
+**Lessons Learned**:
 
-- ❌ Production deployment to Render/Railway/Fly.io
-- ❌ Environment variable configuration on cloud platform
-- ❌ HTTPS endpoint with custom domain
-- ⚠️ Local deployment working perfectly
-
-**Reason for Non-Completion**:
-
-- **Time Constraints**: 3-day development window prioritized core functionality
-- **Technical Challenges**:
-  - FAISS-CPU compilation issues on cloud platforms
-  - SentenceTransformer model size (~400MB) causing build timeouts
-  - Platform-specific dependency conflicts with PyTorch
-- **Mitigation**: Created comprehensive GCP Cloud Run deployment guide (`DEPLOYMENT_GCP.md`)
-
-**Phase 6C: Frontend Deployment** ❌ Not Completed
-
-- ❌ Vercel/Netlify deployment
-- ❌ Production build optimization
-- ❌ Environment variable setup for production API URL
-- ⚠️ Development build fully functional
-
-**Reason for Non-Completion**:
-
-- Dependent on backend deployment completion
-- Focused development time on core AI functionality
-- All code ready for deployment (build scripts tested)
-
----
-
-### 📊 Implementation Summary
-
-| Phase        | Component              | Status             | Completion |
-| ------------ | ---------------------- | ------------------ | ---------- |
-| **Phase 1**  | Agent Foundation       | ✅ Complete        | 100%       |
-| **Phase 2**  | RAG System             | ✅ Complete        | 100%       |
-| **Phase 3**  | Text-to-SQL            | ✅ Complete        | 100%       |
-| **Phase 4**  | Multi-Tool Integration | ✅ Complete        | 100%       |
-| **Phase 5**  | Testing & QA           | ✅ Complete        | 100%       |
-| **Phase 6A** | Frontend UI            | ✅ Complete        | 100%       |
-| **Phase 6B** | Backend Deployment     | ❌ Incomplete      | 0%         |
-| **Phase 6C** | Frontend Deployment    | ❌ Incomplete      | 0%         |
-| **Overall**  |                        | ⚠️ Mostly Complete | **75%**    |
+- Cloud deployment requires different considerations than local development
+- File paths must be absolute and environment-aware
+- ML model memory footprint matters for tier selection
+- Health check timeouts are critical for long-loading services
 
 ---
 
