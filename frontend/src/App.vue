@@ -39,10 +39,10 @@ function handleQuickAction(text: string) {
 }
 
 .app-header {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, #15317a 0%, #0d2257 100%);
   color: white;
   padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(21, 49, 122, 0.15);
 }
 
 .header-content {

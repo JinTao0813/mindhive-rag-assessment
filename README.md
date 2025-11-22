@@ -23,7 +23,7 @@
 
 I am pleased to submit this ZUS Coffee AI Agent project, completed to the best of my abilities within a focused **3-day development period** (as evidenced by the commit history).
 
-Throughout this assessment, I have successfully implemented the majority of the functional requirements outlined in the specification, including:
+Throughout this assessment, I have successfully implemented all functional requirements outlined in the specification, including:
 
 - ✅ Multi-tool ReAct agent with LangChain + LangGraph
 - ✅ RAG system with FAISS for product search
@@ -31,8 +31,9 @@ Throughout this assessment, I have successfully implemented the majority of the 
 - ✅ Conversational memory and context management
 - ✅ Full-stack integration with Vue 3 frontend
 - ✅ Comprehensive testing and documentation
+- ✅ Production deployment (Frontend on Vercel, Backend on Google Cloud Run)
 
-While I acknowledge that I was unable to complete all functional requirements, particularly the production deployment to cloud platforms. I am proud of what has been achieved within the given timeframe. This project has been an invaluable learning experience, marking my first hands-on work with **LangChain and LangGraph technologies**. The challenges encountered and overcome have significantly deepened my understanding of:
+I am proud of what has been achieved within the given timeframe. This project has been an invaluable learning experience, marking my first hands-on work with **LangChain and LangGraph technologies**. The challenges encountered and overcome have significantly deepened my understanding of:
 
 - Agent-based architectures and tool orchestration
 - Vector databases and semantic search
@@ -67,7 +68,10 @@ Thank you for your time and consideration. I look forward to discussing this pro
 
 ## 🎯 Overview
 
-Vercel (Frontend): [https://mindhive-rag-assessment.vercel.app/](https://mindhive-rag-assessment.vercel.app/)
+**Live Deployment:**
+
+- Frontend (Vercel): [https://mindhive-rag-assessment.vercel.app/](https://mindhive-rag-assessment.vercel.app/)
+- Backend (Google Cloud Run): [https://mindhive-backend-554580616888.asia-southeast1.run.app/](https://mindhive-backend-554580616888.asia-southeast1.run.app/)
 
 This project implements an **intelligent conversational agent** for ZUS Coffee that can:
 
@@ -354,17 +358,17 @@ mindhive-rag-assessment/
 
 ### 📊 Implementation Summary
 
-| Phase        | Component              | Status             | Completion | Blocker/Notes                                                                                      |
-| ------------ | ---------------------- | ------------------ | ---------- | -------------------------------------------------------------------------------------------------- |
-| **Phase 1**  | Agent Foundation       | ✅ Complete        | 100%       | -                                                                                                  |
-| **Phase 2**  | RAG System             | ✅ Complete        | 100%       | -                                                                                                  |
-| **Phase 3**  | Text-to-SQL            | ✅ Complete        | 100%       | -                                                                                                  |
-| **Phase 4**  | Multi-Tool Integration | ✅ Complete        | 100%       | -                                                                                                  |
-| **Phase 5**  | Testing & QA           | ✅ Complete        | 100%       | -                                                                                                  |
-| **Phase 6A** | Frontend UI            | ✅ Complete        | 100%       | -                                                                                                  |
-| **Phase 6B** | Backend Deployment     | ❌ Incomplete      | 0%         | Render "no open ports detected" error; suspected file paths, memory limits, or health check issues |
-| **Phase 6C** | Frontend Deployment    | ✅ Complete        | 100%       | Ready to deploy, waiting for backend API endpoint                                                  |
-| **Overall**  |                        | ⚠️ Mostly Complete | **87.5%**  | Core functionality complete, deployment troubleshooting needed                                     |
+| Phase        | Component              | Status      | Completion | Blocker/Notes                                    |
+| ------------ | ---------------------- | ----------- | ---------- | ------------------------------------------------ |
+| **Phase 1**  | Agent Foundation       | ✅ Complete | 100%       | -                                                |
+| **Phase 2**  | RAG System             | ✅ Complete | 100%       | -                                                |
+| **Phase 3**  | Text-to-SQL            | ✅ Complete | 100%       | -                                                |
+| **Phase 4**  | Multi-Tool Integration | ✅ Complete | 100%       | -                                                |
+| **Phase 5**  | Testing & QA           | ✅ Complete | 100%       | -                                                |
+| **Phase 6A** | Frontend UI            | ✅ Complete | 100%       | -                                                |
+| **Phase 6B** | Backend Deployment     | ✅ Complete | 100%       | Deployed to Google Cloud Run (asia-southeast1)   |
+| **Phase 6C** | Frontend Deployment    | ✅ Complete | 100%       | Deployed to Vercel with backend integration      |
+| **Overall**  |                        | ✅ Complete | **100%**   | All phases successfully implemented and deployed |
 
 ---
 
@@ -788,26 +792,28 @@ As this was my **first project using LangChain and LangGraph**, I encountered se
   response = result["messages"][-1].content
   ```
 
-### Challenge 5: Backend Deployment Issues on Render
+### Challenge 5: Backend Deployment to Cloud Platform
 
-**Problem**: Deployment to Render failed with "no open ports detected" error, despite the application working perfectly locally.
+**Problem**: Initial deployment to Render failed with "no open ports detected" error, despite the application working perfectly locally.
 
 **Investigation**:
 
 - Verified build and start commands were correct
 - Ensured `$PORT` environment variable was used in uvicorn
 - Checked FAISS-CPU compatibility with platform
-- Suspected potential issues:
+- Identified potential issues:
   1. Relative file paths breaking in production environment
   2. Free-tier memory limitations (~512MB) insufficient for ML models
   3. Model loading taking too long, causing health check timeout
-  4. Missing runtime.txt specifying Python version
+  4. Platform-specific compatibility issues
 
-**Current Status**:
+**Solution**:
 
-- Application runs flawlessly on localhost
-- Deployment remains incomplete due to platform-specific issues
-- Created comprehensive deployment guide with troubleshooting steps
+- Migrated to Google Cloud Run for better ML workload support
+- Configured proper Dockerfile for containerized deployment
+- Set up environment variables and secret management
+- Successfully deployed to: `https://mindhive-backend-554580616888.asia-southeast1.run.app/`
+- Integrated backend URL with frontend on Vercel
 
 **Lessons Learned**:
 
@@ -815,6 +821,7 @@ As this was my **first project using LangChain and LangGraph**, I encountered se
 - File paths must be absolute and environment-aware
 - ML model memory footprint matters for tier selection
 - Health check timeouts are critical for long-loading services
+- Google Cloud Run provides better support for ML-heavy applications than some PaaS providers
 
 ---
 

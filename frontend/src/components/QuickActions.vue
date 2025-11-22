@@ -76,9 +76,11 @@ const actions = [
 }
 
 .action-btn:hover {
-  background: #f3f4f6;
-  border-color: #2563eb;
+  background: #f8f9fa;
+  border-color: #15317a;
   transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(21, 49, 122, 0.15);
+  color: #15317a;
 }
 
 .action-btn:active {

@@ -91,7 +91,8 @@ textarea {
 
 textarea:focus {
   outline: none;
-  border-color: #2563eb;
+  border-color: #15317a;
+  box-shadow: 0 0 0 3px rgba(21, 49, 122, 0.1);
 }
 
 textarea:disabled {
@@ -107,7 +108,7 @@ textarea::placeholder {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: #2563eb;
+  background: linear-gradient(135deg, #15317a 0%, #1a3d8f 100%);
   color: white;
   border: none;
   cursor: pointer;
@@ -117,11 +118,13 @@ textarea::placeholder {
   font-size: 20px;
   transition: all 0.2s;
   flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(21, 49, 122, 0.3);
 }
 
 .send-btn:hover:not(:disabled) {
-  background: #1d4ed8;
+  background: linear-gradient(135deg, #0d2257 0%, #15317a 100%);
   transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(21, 49, 122, 0.4);
 }
 
 .send-btn:active:not(:disabled) {

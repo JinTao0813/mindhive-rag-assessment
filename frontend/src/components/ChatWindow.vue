@@ -51,6 +51,7 @@ watch(() => [props.messages.length, props.isLoading], async () => {
   display: flex;
   flex-direction: column;
   scroll-behavior: smooth;
+  background: #f8f9fa;
 }
 
 .empty-state {
@@ -60,9 +61,10 @@ watch(() => [props.messages.length, props.isLoading], async () => {
 }
 
 .empty-state h2 {
-  color: #111827;
+  color: #15317a;
   margin-bottom: 12px;
   font-size: 24px;
+  font-weight: 600;
 }
 
 .empty-state p {
@@ -85,16 +87,19 @@ watch(() => [props.messages.length, props.isLoading], async () => {
   display: flex;
   gap: 6px;
   padding: 12px 16px;
-  background: #f3f4f6;
+  background: white;
   border-radius: 18px 18px 18px 4px;
   width: fit-content;
   margin-bottom: 16px;
+  margin-left: 48px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e8ecf4;
 }
 
 .dot {
   width: 8px;
   height: 8px;
-  background: #9ca3af;
+  background: #15317a;
   border-radius: 50%;
   animation: bounce 1.4s infinite ease-in-out;
 }
